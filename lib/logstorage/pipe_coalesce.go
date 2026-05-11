@@ -149,36 +149,9 @@ func parsePipeCoalesce(lex *lexer) (pipe, error) {
 	}
 	lex.nextToken()
 
-	if !lex.isKeyword("(") {
-		return nil, fmt.Errorf("expecting '(' after 'coalesce'; got %q", lex.token)
-	}
-
-	// Parse comma-separated field names in parentheses
-	var srcFields []string
-	for {
-		lex.nextToken()
-		if lex.isKeyword(")") {
-			lex.nextToken()
-			break
-		}
-		if lex.isKeyword(",") {
-			return nil, fmt.Errorf("unexpected ','")
-		}
-
-		fieldName, err := parseFieldName(lex)
-		if err != nil {
-			return nil, fmt.Errorf("cannot parse field name: %w", err)
-		}
-		srcFields = append(srcFields, fieldName)
-
-		if lex.isKeyword(")") {
-			lex.nextToken()
-			break
-		}
-
-		if !lex.isKeyword(",") {
-			return nil, fmt.Errorf("unexpected token: %q; expecting ',' or ')'", lex.token)
-		}
+	srcFields, err := parseFieldNamesInParens(lex)
+	if err != nil {
+		return nil, fmt.Errorf("cannot parse field names: %w", err)
 	}
 
 	if len(srcFields) == 0 {
