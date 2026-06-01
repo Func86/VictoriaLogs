@@ -2581,7 +2581,7 @@ Numeric fields can be transformed into the following string representation at `f
 
 - [RFC3339 time](https://www.rfc-editor.org/rfc/rfc3339) - by adding `time:` in front of the corresponding field name
   containing [Unix timestamp](https://en.wikipedia.org/wiki/Unix_time).
-  The numeric timestamp can be in seconds, milliseconds, microseconds, or nanoseconds — the precision is automatically detected based on the value.
+  The numeric timestamp can be in seconds, milliseconds, microseconds, or nanoseconds - the precision is automatically detected based on the value.
   Both integer and floating-point values are supported.
   For example, `format "time=<time:timestamp>"`.
 
@@ -2660,7 +2660,7 @@ This pipe works in the following way:
 1. If the `<q2>` results have matching rows, then for each matching row the input row is extended
    with new fields seen at the matching row, and the result is sent to the output.
 
-This logic is similar to `LEFT JOIN` in SQL. For example, the following query returns the number of per-user logs across two applications — `app1` and `app2` (see
+This logic is similar to `LEFT JOIN` in SQL. For example, the following query returns the number of per-user logs across two applications - `app1` and `app2` (see
 [stream filters](https://docs.victoriametrics.com/victorialogs/logsql/#stream-filter) for details on the `{...}` filter):
 
 ```logsql
