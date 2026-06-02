@@ -22,6 +22,8 @@ See [these docs](https://docs.victoriametrics.com/victoriametrics/vmauth/#tls-te
 It is recommended authorizing incoming requests via one of the supported methods at `vmauth` according
 to [these docs](https://docs.victoriametrics.com/victoriametrics/vmauth/#authorization).
 
+See also [how to protect security-sensitive HTTP-based endpoints](https://docs.victoriametrics.com/victorialogs/security-and-lb/#system-endpoints).
+
 ## Vmauth config examples
 
 This document contains the following configuration examples for `vmauth`:
@@ -476,9 +478,10 @@ curl -u "vlagent:$(cat /path/to/file)" http://localhost:9429/insert/jsonline -H 
     -d '{"_msg":"Hello, VictoriaLogs!"}'
 ```
 
-### System endpoints
+## System endpoints
 
-The following HTTP endpoints can be protected with keys specified via dedicated `-*AuthKey` command-line flags.
+The following HTTP endpoints at VictoriaLogs components can be protected with keys specified via dedicated `-*AuthKey` command-line flags.
+This may be needed if the corresponding VictoriaLogs components are exposed to untrusted networks.
 
 - [`/metrics`](https://docs.victoriametrics.com/victorialogs/metrics/) - monitoring endpoint for VictoriaMetrics, vmagent, and Prometheus.
   Use `-metricsAuthKey` [command-line flag](https://docs.victoriametrics.com/victorialogs/#list-of-command-line-flags).
@@ -504,7 +507,11 @@ For example, if VictoriaLogs is started with the `-metricsAuthKey=top-secret` co
 curl 'http://victoria-logs:9428/metrics?authKey=top-secret'
 ```
 
-### TLS/SSL
+Enable HTTPS on the VictoriaLogs components which accept `authKey` in order to prevent from stealing the `authKey` by attackers
+who listen for the requests over untrusted networks such as the Internet.
+See [how to enable TLS](https://docs.victoriametrics.com/victorialogs/security-and-lb/#enabling-tls-on-the-server).
+
+## TLS/SSL
 
 While all VictoriaLogs components support receiving HTTP requests over TLS (aka HTTPS),
 this isn't needed if the components run in the same trusted private network
@@ -513,7 +520,7 @@ Enabling TLS complicates the configuration and slows down communication between 
 
 If you still want enabling TLS between VictoriaLogs components, then read below.
 
-#### Enabling TLS on the server
+### Enabling TLS on the server
 
 Pass the following command-line flags to VictoriaLogs component in order to enable receiving HTTPS
 requests at the TCP address specified via `-httpListenAddr`:
@@ -530,7 +537,7 @@ For example, the following command starts VictoriaLogs, which accepts HTTPS requ
 
 See also [how to enable mTLS on any VictoriaLogs component](https://docs.victoriametrics.com/victorialogs/security-and-lb/#mtls).
 
-#### Connecting vlagent to VictoriaLogs with TLS
+### Connecting vlagent to VictoriaLogs with TLS
 
 To send data over TLS, simply change the URL scheme from `http` to `https` in the `-remoteWrite.url`:
 
@@ -549,7 +556,7 @@ For testing purposes only, you can disable certificate verification with `-remot
 **Security Warning:** Disabling certificate verification eliminates
 protection against man-in-the-middle attacks. Never use this in production.
 
-#### Automatic issuing of TLS certificates
+### Automatic issuing of TLS certificates
 
 All the [VictoriaLogs Enterprise](https://docs.victoriametrics.com/victoriametrics/enterprise/) components support automatic issuing of TLS certificates
 for public HTTPS server running at `-httpListenAddr` via [Let's Encrypt service](https://letsencrypt.org/).
@@ -576,14 +583,14 @@ Example of starting VictoriaLogs with automatic TLS certificate issuing:
     -licenseFile=/path/to/license
 ```
 
-### mTLS
+## mTLS
 
 > This feature requires [Enterprise binaries](https://docs.victoriametrics.com/victoriametrics/enterprise/) for VictoriaLogs components that use mTLS.
 
 Mutual TLS ([mTLS](https://en.wikipedia.org/wiki/Mutual_authentication)) requires both client and server to present valid certificates for authentication.
 Unlike standard TLS where only the server authenticates itself, mTLS enables bidirectional authentication.
 
-#### Enabling mTLS on the server
+### Enabling mTLS on the server
 
 mTLS requires both [standard TLS command-line flags for server](https://docs.victoriametrics.com/victorialogs/security-and-lb/#enabling-tls-on-the-server)
 and additional `-mtls` command-line flag:
@@ -601,7 +608,7 @@ If using certificates signed by a private CA not present in the system trust sto
 1. Install your CA certificate in the system's trusted certificate store.
 1. Specify the CA certificate path manually using `-mtlsCAFile` command-line flag.
 
-#### Connecting vlagent to VictoriaLogs with mTLS
+### Connecting vlagent to VictoriaLogs with mTLS
 
 Specify `-remoteWrite.tlsCertFile` and `-remoteWrite.tlsKeyFile` command-line flags for the corresponding `-remoteWrite.url`
 which requires mTLS. Optionally, specify `-remoteWrite.tlsCAFile`:
@@ -613,7 +620,7 @@ which requires mTLS. Optionally, specify `-remoteWrite.tlsCAFile`:
     -remoteWrite.tlsKeyFile=/path/to/client-key.pem
 ```
 
-### Certificate reloading
+## Certificate reloading
 
 VictoriaLogs automatically re-reads TLS certificate files (server certificates, client certificates, and CA certificates)
 without requiring server or client restarts.
