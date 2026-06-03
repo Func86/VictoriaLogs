@@ -241,7 +241,7 @@ It is also recommended to authorize HTTPS requests to `vlstorage` via Basic Auth
   ./victoria-logs-prod -storageNode=... -storageNode.tls -storageNode.username=... -storageNode.password=...
   ```
 
-See also [how to set up mTLS between VictoriaLogs cluster nodes](https://docs.victoriametrics.com/victorialogs/cluster/#tls).
+See also [how to set up mTLS between VictoriaLogs cluster nodes](https://docs.victoriametrics.com/victorialogs/cluster/#mtls).
 
 ### mTLS
 
