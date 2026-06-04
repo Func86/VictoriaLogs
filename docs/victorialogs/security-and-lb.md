@@ -433,6 +433,10 @@ See [these docs](https://docs.victoriametrics.com/victoriametrics/vmauth/#query-
 
 ## Basic Auth
 
+It is recommended to run all the VictoriaLogs components in a secure trusted network, and proxying only the properly authorized requests
+according to [these docs](https://docs.victoriametrics.com/victorialogs/security-and-lb/#security-on-untrusted-networks). If you still
+want exposing individual VictoriaLogs components to untrusted networks such as Internet, then secure access to them via Basic Auth according to the docs below.
+
 All the VictoriaLogs components support request authentication via [Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication)
 for the HTTP requests received at TCP address specified via `-httpListenAddr` command-line flag.
 
