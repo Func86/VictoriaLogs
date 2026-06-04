@@ -1177,6 +1177,13 @@ Web UI provides the following modes for displaying query results:
 
 See also [command line interface](https://docs.victoriametrics.com/victorialogs/querying/#command-line).
 
+### Building web UI from source
+
+Web UI source code is located in the [`app/vmui` folder](https://github.com/VictoriaMetrics/VictoriaLogs/tree/master/app/vmui)
+at [VictoriaLogs repository](https://github.com/VictoriaMetrics/VictoriaLogs/).
+Follow [these instructions](https://github.com/VictoriaMetrics/VictoriaLogs/tree/master/app/vmui#updating-vmui-embedded-into-victorialogs)
+in order to build Web UI into a js bundle and embed it into VictoriaLogs executable.
+
 ## Visualization in Grafana
 
 [VictoriaLogs Grafana datasource](https://docs.victoriametrics.com/victorialogs/integrations/grafana/) allows you to query and visualize VictoriaLogs data in Grafana.
