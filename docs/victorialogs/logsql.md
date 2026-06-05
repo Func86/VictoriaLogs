@@ -242,8 +242,8 @@ Tip: try [`*` filter](https://docs.victoriametrics.com/victorialogs/logsql/#any-
 Do not worry - this doesn't crash VictoriaLogs, even if the query selects trillions of logs. See [these docs](https://docs.victoriametrics.com/victorialogs/querying/#command-line)
 if you are curious why.
 
-In addition to filters, LogsQL query may contain an arbitrary mix of optional actions for processing the selected logs. These actions are delimited by `|`
-and are known as [`pipes`](https://docs.victoriametrics.com/victorialogs/logsql/#pipes).
+In addition to filters, LogsQL query may contain an arbitrary mix of optional actions for processing the selected logs in sequence.
+These actions are delimited by `|` and are known as [`pipes`](https://docs.victoriametrics.com/victorialogs/logsql/#pipes).
 For example, the following query uses [`stats` pipe](https://docs.victoriametrics.com/victorialogs/logsql/#stats-pipe) for returning
 the number of [log messages](https://docs.victoriametrics.com/victorialogs/keyconcepts/#message-field)
 with the `error` [word](https://docs.victoriametrics.com/victorialogs/logsql/#word) for the last 5 minutes:
@@ -264,7 +264,8 @@ If the filter must be applied to other [log field](https://docs.victoriametrics.
 then its name followed by the colon must be put in front of the filter. For example, if `error` [word filter](https://docs.victoriametrics.com/victorialogs/logsql/#word-filter) must be applied
 to the `log.level` field, then use `log.level:error` query.
 
-If you want to search across multiple fields with names starting with some prefix, then see [these docs](https://docs.victoriametrics.com/victorialogs/logsql/#searching-over-multiple-fields).
+VictoriaLogs supports searching across multiple fields with names starting with some prefix
+according to [these docs](https://docs.victoriametrics.com/victorialogs/logsql/#searching-over-multiple-fields).
 
 Field names and filter args can be put into quotes if they contain special chars, which may clash with LogsQL syntax. LogsQL supports quoting via double quotes `"`,
 single quotes `'` and backticks according to [these docs](https://docs.victoriametrics.com/victorialogs/logsql/#string-literals):
@@ -274,6 +275,12 @@ single quotes `'` and backticks according to [these docs](https://docs.victoriam
 ```
 
 If in doubt, it is recommended quoting field names and filter args.
+
+If the LogsQL query is automatically built from third-party input, then all such input must be properly quoted before putting it into the query,
+in order to avoid syntax breakage and various security issues.
+
+If multiple filters are applied to the same log field, then LogsQL provides shorter syntax when the given field is mentioned only once.
+For example, `(field:foo OR field:bar) AND field:~"a.+b"` can be replaced with `field:((foo OR -bar) AND ~"a.+b")`.
 
 The list of LogsQL filters:
 
