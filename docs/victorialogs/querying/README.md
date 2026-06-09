@@ -259,7 +259,7 @@ The `<start>` and `<end>` args can contain values in [any supported format](http
 If `<start>` is missing, then it equals to the minimum timestamp across logs stored in VictoriaLogs.
 If `<end>` is missing, then it equals to the maximum timestamp across logs stored in VictoriaLogs.
 
-The `<step>` and `<offset>` args can contain values in [the format specified here](https://docs.victoriametrics.com/victorialogs/logsql/#stats-by-time-buckets).
+The `<step>` and `<offset>` args can contain values in [the format specified here](https://docs.victoriametrics.com/victorialogs/logsql/#duration-values).
 
 For example, the following command returns per-hour number of [log messages](https://docs.victoriametrics.com/victorialogs/keyconcepts/#message-field)
 with the `error` [word](https://docs.victoriametrics.com/victorialogs/logsql/#word) over logs for the last 3 hours:
@@ -562,7 +562,7 @@ The `<start>` and `<end>` args can contain values in [any supported format](http
 If `<start>` is missing, then it equals to the minimum timestamp across logs stored in VictoriaLogs.
 If `<end>` is missing, then it equals to the maximum timestamp across logs stored in VictoriaLogs.
 
-The `<step>` and `<offset>` args can contain values in [the format specified here](https://docs.victoriametrics.com/victorialogs/logsql/#stats-by-time-buckets).
+The `<step>` and `<offset>` args can contain values in [the format specified here](https://docs.victoriametrics.com/victorialogs/logsql/#duration-values).
 
 Note: The `/select/logsql/stats_query_range` endpoint relies on `_time` field for time bucketing
 and therefore does not allow any pipe to change or remove the `_time` before the `| stats ...` pipe.
