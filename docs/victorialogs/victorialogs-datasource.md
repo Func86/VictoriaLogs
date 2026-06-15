@@ -30,7 +30,7 @@ Moved to [victorialogs/integrations/grafana](https://docs.victoriametrics.com/vi
 
 Moved to [victorialogs/integrations/grafana](https://docs.victoriametrics.com/victorialogs/integrations/grafana/#configuration-via-file).
 
-##### Building queries
+## Building queries
 
 Moved to [victorialogs/integrations/grafana](https://docs.victoriametrics.com/victorialogs/integrations/grafana/#building-queries).
 
