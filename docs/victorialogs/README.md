@@ -203,6 +203,17 @@ or
 /path/to/victoria-logs -retention.maxDiskUsagePercent=85 -retentionPeriod=100y
 ```
 
+### Limitations of disk space usage-based retention
+
+Disk space usage is checked periodically. Disk usage can go over the `-retention.maxDiskUsage*` limit between two checks.
+The disk could reach 100% usage especially when the actual disk size is small, and the ingestion rate is high.
+In this case, VictoriaLogs switches to read-only mode and cannot drop data as expected.
+So it is important to reserve enough free disk space to prevent VictoriaLogs from entering read-only mode.
+
+For example, running VictoriaLogs on a 20 GB disk with `-retention.maxDiskUsagePercent=95` and an ingestion rate of 100 MB/s is not recommended.
+
+See also [Capacity planning](https://docs.victoriametrics.com/victorialogs/#capacity-planning), which recommends reserving at least 20% free storage space.
+
 ## Backfilling
 
 VictoriaLogs accepts logs with timestamps in the time range `[now-retentionPeriod ... now+futureRetention]`,
