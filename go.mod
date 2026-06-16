@@ -3,7 +3,7 @@ module github.com/VictoriaMetrics/VictoriaLogs
 go 1.26.4
 
 require (
-	github.com/VictoriaMetrics/VictoriaMetrics v1.145.1-0.20260615112017-22802101e09a
+	github.com/VictoriaMetrics/VictoriaMetrics v1.145.1-0.20260616130439-5b31a047a5bf
 	github.com/VictoriaMetrics/easyproto v1.2.0
 	github.com/VictoriaMetrics/metrics v1.43.2
 	github.com/bmatcuk/doublestar/v4 v4.10.0
