@@ -3923,6 +3923,17 @@ func needQuoteToken(s string) bool {
 	if isPipeName(sLower) || isStatsFuncName(sLower) {
 		return true
 	}
+
+	// The parser requires a value starting with a reserved keyword to be quoted, so quote it here too.
+	// Otherwise String() emits something the parser can't read back (e.g. internally in Query.Clone()).
+	// See https://github.com/VictoriaMetrics/VictoriaLogs/issues/1434
+	firstTok := newLexer(sLower, 0).token
+	if firstTok != sLower {
+		if _, ok := reservedKeywords[firstTok]; ok {
+			return true
+		}
+	}
+
 	for _, r := range s {
 		if !isTokenRune(r) && r != '.' {
 			return true
