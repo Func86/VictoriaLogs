@@ -2535,7 +2535,7 @@ func TestParseQuery_Success(t *testing.T) {
 	f(`_time:[5m, 10m]OR not(x)`, `_time:[5m,10m] or !x`)
 	f(`(a)and(b)`, `a b`)
 	f(`_time:[5m, 10m]ANd not(x)`, `_time:[5m,10m] !x`)
-	f(`*|(foo)`, `foo`)
+	f(`*|* (foo)`, `foo`)
 	f(`a:(foo)`, `a:foo`)
 	f(`((a))`, `a`)
 	f(`!(a)`, `!a`)
@@ -3497,6 +3497,15 @@ func TestParseQuery_Failure(t *testing.T) {
 	f(`* | unpack_syslog.x`)
 	f(`* | unpack_words.x`)
 	f(`* | unroll.x`)
+
+	// incorrect stats functions
+	f(`* | count`)
+	f(`* | count x`)
+	f(`* | count as`)
+	f(`* | by`)
+	f(`* | (x)`)
+	f(`* | by (x)`)
+	f(`* | (x) count`)
 }
 
 func TestQueryGetNeededColumns(t *testing.T) {

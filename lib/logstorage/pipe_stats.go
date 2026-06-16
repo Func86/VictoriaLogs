@@ -1395,7 +1395,7 @@ func parsePipeStatsExt(lex *lexer, needStatsKeyword bool) (pipe, error) {
 	for {
 		e, err := parseStatsEntry(lex)
 		if err != nil {
-			return nil, fmt.Errorf("cannot parse 'stats' entry: %w", err)
+			return nil, err
 		}
 		ps.entries = append(ps.entries, e)
 

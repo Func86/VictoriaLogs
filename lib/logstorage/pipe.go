@@ -146,16 +146,17 @@ func parsePipe(lex *lexer) (pipe, error) {
 		return p, nil
 	}
 
-	lexState := lex.backupState()
-
-	// Try parsing stats pipe without 'stats' keyword
-	ps, err := parsePipeStatsNoStatsKeyword(lex)
-	if err == nil {
+	if isStatsFuncName(lex.rawToken) || lex.isKeyword("by", "(") {
+		// Try parsing stats pipe without 'stats' keyword
+		ps, err := parsePipeStatsNoStatsKeyword(lex)
+		if err != nil {
+			return nil, fmt.Errorf("cannot parse 'stats' pipe: %w", err)
+		}
 		return ps, nil
 	}
-	lex.restoreState(lexState)
 
 	// Try parsing filter pipe without 'filter' keyword
+	lexState := lex.backupState()
 	pf, err := parsePipeFilterNoFilterKeyword(lex)
 	if err == nil {
 		return pf, nil
