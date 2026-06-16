@@ -1442,7 +1442,7 @@ func parseStatsEntry(lex *lexer) (pipeStatsEntry, error) {
 	}
 
 	resultName := ""
-	if lex.isKeywordOrQueryPartTrailer(",") {
+	if lex.isKeyword(",") || lex.isQueryPartTrailer() {
 		resultName = sf.String()
 		if iff != nil {
 			resultName += " " + iff.String()

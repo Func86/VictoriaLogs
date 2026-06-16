@@ -226,13 +226,6 @@ func (lex *lexer) checkPrevAdjacentToken(tokens ...string) error {
 	return nil
 }
 
-func (lex *lexer) isKeywordOrQueryPartTrailer(keywords ...string) bool {
-	if lex.isKeywordAny(keywords) {
-		return true
-	}
-	return lex.isQueryPartTrailer()
-}
-
 func (lex *lexer) isQueryPartTrailer() bool {
 	return lex.isKeywordAny(queryPartTrailers)
 }
@@ -2170,7 +2163,7 @@ func parseFilterAnd(lex *lexer, fieldName string) (filter, error) {
 		}
 		filters = append(filters, f)
 		switch {
-		case lex.isKeywordOrQueryPartTrailer("or"):
+		case lex.isKeyword("or") || lex.isQueryPartTrailer():
 			if len(filters) == 1 {
 				return filters[0], nil
 			}

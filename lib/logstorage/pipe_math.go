@@ -481,7 +481,7 @@ func parseMathEntry(lex *lexer) (*mathEntry, error) {
 	}
 
 	resultField := ""
-	if lex.isKeywordOrQueryPartTrailer(",") {
+	if lex.isKeyword(",") || lex.isQueryPartTrailer() {
 		resultField = me.String()
 	} else {
 		if lex.isKeyword("as") {
