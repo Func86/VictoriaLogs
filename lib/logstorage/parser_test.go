@@ -2049,7 +2049,7 @@ func TestParseQuery_Success(t *testing.T) {
 	f("re('foo|ba(r.+)')", `~"foo|ba(r.+)"`)
 	f("re(foo)", `~foo`)
 	f(`foo:re(foo-bar/baz.)`, `foo:~"foo-bar/baz."`)
-	f(`~foo.bar.baz !~bar`, `~foo.bar.baz !~bar`)
+	f(`~foo.bar.baz !~bar`, `~"foo.bar.baz" !~bar`)
 	f(`foo:~"~foo~ba/ba>z"`, `foo:~"~foo~ba/ba>z"`)
 	f(`foo:~'.*'`, `*`)
 	f(`foo:~'.+'`, `foo:*`)
@@ -2090,7 +2090,7 @@ func TestParseQuery_Success(t *testing.T) {
 	f(`"\xff"`, `"\xff"`)
 
 	// ip addresses in the query
-	f("1.2.3.4 or ip:5.6.7.9", "1.2.3.4 or ip:5.6.7.9")
+	f("1.2.3.4 or ip:5.6.7.9", `"1.2.3.4" or ip:"5.6.7.9"`)
 
 	// '-' and '.' chars in field name and search phrase
 	f("trace-id.foo.bar:baz", `"trace-id.foo.bar":baz`)
@@ -2113,13 +2113,13 @@ func TestParseQuery_Success(t *testing.T) {
 	f(`(_time:(2023-04-20, now] or _time:[-10m, -1m))
 		and (_stream:{job="a"} or _stream:{instance!="b"})
 		and (err* or ip:(ipv4_range(1.2.3.0, 1.2.3.255) and not 1.2.3.4))`,
-		`(_time:(2023-04-20,now] or _time:[-10m,-1m)) ({job="a"} or {instance!="b"}) (err* or ip:ipv4_range(1.2.3.0, 1.2.3.255) !ip:1.2.3.4)`)
+		`(_time:(2023-04-20,now] or _time:[-10m,-1m)) ({job="a"} or {instance!="b"}) (err* or ip:ipv4_range(1.2.3.0, 1.2.3.255) !ip:"1.2.3.4")`)
 
 	// fields pipe
 	f(`foo|fields *`, `foo | fields *`)
 	f(`foo | fields bar`, `foo | fields bar`)
 	f(`foo|FIELDS bar,Baz  , "a,b|c"`, `foo | fields bar, Baz, "a,b|c"`)
-	f(`foo | Fields   x.y, "abc:z/a", _b$c`, `foo | fields x.y, "abc:z/a", "_b$c"`)
+	f(`foo | Fields   x.y, "abc:z/a", _b$c`, `foo | fields "x.y", "abc:z/a", "_b$c"`)
 	f(`foo | fields "", a`, `foo | fields _msg, a`)
 
 	// multiple fields pipes
@@ -2382,7 +2382,7 @@ func TestParseQuery_Success(t *testing.T) {
 	f(`* | stats by (_time:1d offset -2h, f2)
 	   count() if (is_admin:true or _msg:"foo bar"*) as foo,
 	   sum(duration) if (host:in('foo.com', 'bar.com') and path:/foobar) as bar`,
-		`* | stats by (_time:1d offset -2h, f2) count(*) if (is_admin:true or "foo bar"*) as foo, sum(duration) if (host:in(foo.com,bar.com) path:"/foobar") as bar`)
+		`* | stats by (_time:1d offset -2h, f2) count(*) if (is_admin:true or "foo bar"*) as foo, sum(duration) if (host:in("foo.com","bar.com") path:"/foobar") as bar`)
 	f(`* | stats count(x) if (error ip:in(_time:1d | fields ip)) rows`, `* | stats count(x) if (error ip:in(_time:1d | fields ip)) as rows`)
 	f(`* | stats count() if () rows`, `* | stats count(*) if (*) as rows`)
 
@@ -2432,7 +2432,7 @@ func TestParseQuery_Success(t *testing.T) {
 	f(`* | uniq (f1,f2) limit 10`, `* | uniq by (f1, f2) limit 10`)
 
 	// filter pipe
-	f(`* | filter error ip:12.3.4.5 or warn`, `error ip:12.3.4.5 or warn`)
+	f(`* | filter error ip:12.3.4.5 or warn`, `error ip:"12.3.4.5" or warn`)
 	f(`foo | stats by (host) count() logs | filter logs:>50 | sort by (logs desc) | limit 10`, `foo | stats by (host) count(*) as logs | filter logs:>50 | sort by (logs desc) limit 10`)
 	f(`* | "error"`, `error`)
 	f(`* | filter error`, `error`)
@@ -2559,8 +2559,8 @@ func TestParseQuery_Success(t *testing.T) {
 	f(`filter foo:bar`, `"filter" foo:bar`)
 	f(`stats count`, `"stats" "count"`)
 	f(`count`, `"count"`)
-	f(`fields.foo:bar`, `fields.foo:bar`)
-	f(`fields.foo`, `fields.foo`)
+	f(`fields.foo:bar`, `"fields.foo":bar`)
+	f(`fields.foo`, `"fields.foo"`)
 
 	f(`foo | filter stats`, `foo "stats"`)
 	f(`foo | limit 1 | filter stats`, `foo | limit 1 | filter "stats"`)
@@ -2572,10 +2572,11 @@ func TestParseQuery_Success(t *testing.T) {
 
 	// wildcard field names in filters
 	f("foo*:bar", "foo*:bar")
-	f("f.oo* : bar", "f.oo*:bar")
+	f("f.oo* : bar", `"f.oo"*:bar`)
 	f(`"foo"* : bar`, `foo*:bar`)
 	f(`'foo*' :bar`, `foo*:bar`)
-	f(`"foo:*":bar`, `"foo:*":bar`)
+	f(`"foo:*":bar`, `"foo:"*:bar`)
+	f(`"foo:"*:bar`, `"foo:"*:bar`)
 	f(`*:abc`, `*:abc`)
 	f(`* :abc`, `*:abc`)
 	f(` * : abc`, `*:abc`)
@@ -3921,7 +3922,7 @@ func TestQueryClone(t *testing.T) {
 	f(`"."`)
 	f(`foo:"."`)
 	f(`~"."`)
-	f(`~.abc`)
+	f(`~".abc"`)
 	f(`~".?"`)
 	f(`seq(".")`)
 	f("_time:5m error | fields foo, bar")
