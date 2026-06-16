@@ -209,7 +209,7 @@ which were ingested into VictoriaLogs during the last hour, before starting live
 curl -N http://localhost:9428/select/logsql/tail -d 'query=*' -d 'start_offset=1h'
 ```
 
-Live tailing delays delivering new logs for one second, so they could be properly delivered from log collectors to VictoriaLogs.
+Live tailing delays returning new logs for 5 seconds, so they could be properly delivered from log collectors to VictoriaLogs.
 This delay can be changed via `offset` query arg. For example, the following command delays delivering new logs for 30 seconds:
 
 ```sh
