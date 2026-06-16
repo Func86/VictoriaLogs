@@ -146,7 +146,7 @@ func parsePipe(lex *lexer) (pipe, error) {
 		return p, nil
 	}
 
-	if isStatsFuncName(lex.rawToken) || lex.isKeyword("by", "(") {
+	if isLikelyStatsPipe(lex) {
 		// Try parsing stats pipe without 'stats' keyword
 		ps, err := parsePipeStatsNoStatsKeyword(lex)
 		if err != nil {
@@ -155,15 +155,38 @@ func parsePipe(lex *lexer) (pipe, error) {
 		return ps, nil
 	}
 
-	// Try parsing filter pipe without 'filter' keyword
-	lexState := lex.backupState()
-	pf, err := parsePipeFilterNoFilterKeyword(lex)
-	if err == nil {
+	if isLikelyFilterPipe(lex) {
+		// Try parsing filter pipe without 'filter' keyword
+		pf, err := parsePipeFilterNoFilterKeyword(lex)
+		if err != nil {
+			return nil, fmt.Errorf("cannot parse 'filter' pipe: %w", err)
+		}
 		return pf, nil
 	}
-	lex.restoreState(lexState)
 
 	return nil, fmt.Errorf("unexpected pipe %q", lex.token)
+}
+
+func isLikelyStatsPipe(lex *lexer) bool {
+	return isStatsFuncName(lex.rawToken) || lex.isKeyword("by", "(")
+}
+
+func isLikelyFilterPipe(lex *lexer) bool {
+	if lex.isQuotedToken() {
+		return true
+	}
+	if lex.isKeyword("*", "-", "~") {
+		return true
+	}
+
+	lexState := lex.backupState()
+	defer lex.restoreState(lexState)
+
+	stopTokens := []string{":"}
+	if _, err := lex.nextCompoundTokenExt(stopTokens); err != nil {
+		return false
+	}
+	return lex.isKeyword(":")
 }
 
 var pipeParsers map[string]pipeParseFunc
