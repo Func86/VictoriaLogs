@@ -38,6 +38,7 @@ Integration and Data Collection:
 * [Using Vector and VictoriaLogs for Collect Switch Syslog](https://blog.vitalvas.com/post/2024/12/02/using-vector-and-victorialogs-for-collect-switch-syslog/)
 * [Using pebble to ship application logs to VictoriaLogs](https://blog.nndi.cloud/posts/using-pebble-to-send-logs-to-loki/)
 * [How to Extend Percona Monitoring and Management to Add Logging Functionality](https://www.percona.com/blog/how-to-extend-percona-monitoring-and-management-to-add-logging-functionality/)
+* [Getting Victoria Logs running on FreeBSD](https://dan.langille.org/2026/06/14/getting-victoria-logs-running-on-freebsd/)
 
 Grafana and Visualization:
 
