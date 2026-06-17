@@ -201,6 +201,9 @@ The log fields are returned in alphabetical order unless the query ends with [pi
 which explicitly set the order of the returned fields, such as [`fields`](https://docs.victoriametrics.com/victorialogs/logsql/#fields-pipe)
 or [`stats`](https://docs.victoriametrics.com/victorialogs/logsql/#stats-pipe).
 
+Live tailing preserves the order of returned logs only within a single [log stream](https://docs.victoriametrics.com/victorialogs/keyconcepts/#stream-fields).
+Logs from different streams may be returned out of order, since the order is tracked per stream.
+
 Live tailing supports returning historical logs, which were ingested into VictoriaLogs before the start of live tailing. Pass `start_offset=<d>` query
 arg to `/select/logsql/tail` where `<d>` is the duration for returning historical logs. For example, the following command returns historical logs
 which were ingested into VictoriaLogs during the last hour, before starting live tailing:
