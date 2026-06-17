@@ -22,6 +22,10 @@ according to the following docs:
 
 ## tip
 
+## [v1.51.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.51.0)
+
+Released at 2026-06-17
+
 * SECURITY: upgrade Go builder from Go1.26.2 to Go1.26.4. See [the list of issues addressed in Go1.26.3](https://github.com/golang/go/issues?q=milestone%3AGo1.26.3%20label%3ACherryPickApproved) and [the list of issues addressed in Go1.26.4](https://github.com/golang/go/issues?q=milestone%3AGo1.26.4%20label%3ACherryPickApproved).
 
 * FEATURE: [vmalert](https://docs.victoriametrics.com/victorialogs/vmalert/): add `-vmalert.proxyURL` command-line flag, which allows proxying `/select/vmalert/*` requests from VictoriaLogs to `vmalert`. See [#90](https://github.com/VictoriaMetrics/VictoriaLogs/issues/90) and [these docs](https://docs.victoriametrics.com/victorialogs/#vmalert).
