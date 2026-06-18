@@ -169,7 +169,6 @@ func ProcessFacetsRequest(ctx context.Context, w http.ResponseWriter, r *http.Re
 		fieldValues := columns[1].Values
 		hits := columns[2].Values
 
-		bb := blockResultPool.Get()
 		for i := range fieldNames {
 			fieldName := strings.Clone(fieldNames[i])
 			fieldValue := strings.Clone(fieldValues[i])
@@ -182,7 +181,6 @@ func ProcessFacetsRequest(ctx context.Context, w http.ResponseWriter, r *http.Re
 			})
 			mLock.Unlock()
 		}
-		blockResultPool.Put(bb)
 	}
 
 	qctx := ca.newQueryContext(ctx)
