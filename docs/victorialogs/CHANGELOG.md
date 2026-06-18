@@ -28,6 +28,8 @@ according to the following docs:
 
 Released at 2026-06-17
 
+**Update Note:** [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/): disallow using [`filter` pipes](https://docs.victoriametrics.com/victorialogs/logsql/#filter-pipe) without the `filter` prefix if the filter doesn't start with `field_name:` prefix. For example, `foo | bar` is disallowed now. It must be rewritten to one of the following equivalents: `foo bar`, `foo | "bar"`, `foo | _msg:bar` or `foo | filter bar`. This reduces the chances of incorrectly written queries like in the [#1454](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1454). However, this may be a breaking change if you have queries that filter without the `filter` prefix, such as `... | !foo`, `... | {host="x"}`, `... | >5` or `... | =foo` - these now fail with `unexpected pipe` and must add the `filter` prefix (e.g. `... | filter !foo`).
+
 * SECURITY: upgrade Go builder from Go1.26.2 to Go1.26.4. See [the list of issues addressed in Go1.26.3](https://github.com/golang/go/issues?q=milestone%3AGo1.26.3%20label%3ACherryPickApproved) and [the list of issues addressed in Go1.26.4](https://github.com/golang/go/issues?q=milestone%3AGo1.26.4%20label%3ACherryPickApproved).
 
 * FEATURE: [vmalert](https://docs.victoriametrics.com/victorialogs/vmalert/): add `-vmalert.proxyURL` command-line flag, which allows proxying `/select/vmalert/*` requests from VictoriaLogs to `vmalert`. See [#90](https://github.com/VictoriaMetrics/VictoriaLogs/issues/90) and [these docs](https://docs.victoriametrics.com/victorialogs/#vmalert).
