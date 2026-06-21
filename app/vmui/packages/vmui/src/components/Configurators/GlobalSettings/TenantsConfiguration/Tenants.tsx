@@ -1,8 +1,7 @@
-import { FC, useRef, useState } from "preact/compat";
+import { FC, useEffect, useState, useMemo, useRef } from "preact/compat";
 import { useSearchParams } from "react-router-dom";
 import { useFetchAccountIds } from "./hooks/useFetchAccountIds";
 import TenantsSelect from "./TenantsSelect";
-import TenantsFields from "./TenantsFields";
 import Button from "../../../Main/Button/Button";
 import classNames from "classnames";
 import Tooltip from "../../../Main/Tooltip/Tooltip";
@@ -19,13 +18,18 @@ export type TenantType = {
 }
 
 const Tenants: FC = () => {
-  const { accountIds } = useFetchAccountIds();
+  const { tenants, defaultTenant, isLoading, error } = useFetchAccountIds();
   const { isMobile } = useDeviceDetect();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const accountId = searchParams.get("accountID") || "0";
   const projectId = searchParams.get("projectID") || "0";
   const tenantId = `${accountId}:${projectId}`;
+  const selectedTenant = useMemo(
+    () => tenants.find((tenant) => `${tenant.accountID}:${tenant.projectID}` === tenantId),
+    [tenantId, tenants]
+  );
+  const selectedLabel = selectedTenant?.label || (isLoading ? "Loading tenant" : "Select tenant");
 
   const buttonRef = useRef<HTMLDivElement>(null);
   const [search, setSearch] = useState("");
@@ -37,15 +41,25 @@ const Tenants: FC = () => {
   } = useBoolean(false);
 
   const onChange = ({ accountId, projectId }: Partial<TenantType>) => {
-    if (accountId) searchParams.set("accountID", accountId);
-    if (projectId) searchParams.set("projectID", projectId);
-    setSearchParams(searchParams);
+    const next = new URLSearchParams(searchParams);
+    if (accountId) next.set("accountID", accountId);
+    if (projectId) next.set("projectID", projectId);
+    setSearchParams(next);
     handleClosePopup();
   };
 
+  useEffect(() => {
+    if (accountId !== "0" || projectId !== "0" || !defaultTenant) return;
+
+    const next = new URLSearchParams(searchParams);
+    next.set("accountID", defaultTenant.accountID);
+    next.set("projectID", defaultTenant.projectID);
+    setSearchParams(next, { replace: true });
+  }, [accountId, defaultTenant, projectId, searchParams, setSearchParams]);
+
   const childrenProps = {
     tenantId,
-    accountIds,
+    tenants,
     accountId,
     projectId,
     search,
@@ -64,8 +78,8 @@ const Tenants: FC = () => {
             >
               <span className="vm-mobile-option__icon"><StorageIcon/></span>
               <div className="vm-mobile-option-text">
-                <span className="vm-mobile-option-text__label">Tenant ID</span>
-                <span className="vm-mobile-option-text__value">{tenantId}</span>
+                <span className="vm-mobile-option-text__label">Tenant</span>
+                <span className="vm-mobile-option-text__value">{selectedLabel}</span>
               </div>
               <span className="vm-mobile-option__arrow"><ArrowDownIcon/></span>
             </div>
@@ -88,7 +102,7 @@ const Tenants: FC = () => {
               )}
               onClick={toggleOpenPopup}
             >
-              {tenantId}
+              {selectedLabel}
             </Button>
           )}
         </div>
@@ -98,9 +112,15 @@ const Tenants: FC = () => {
         placement="bottom-right"
         onClose={handleClosePopup}
         buttonRef={buttonRef}
-        title={isMobile ? "Define Tenant ID" : undefined}
+        title={isMobile ? "Tenant" : undefined}
       >
-        {accountIds.length ? <TenantsSelect {...childrenProps}/> : <TenantsFields {...childrenProps}/>}
+        {tenants.length ? (
+          <TenantsSelect {...childrenProps}/>
+        ) : (
+          <div className="vm-list vm-tenant-input-list">
+            <div className="vm-tenant-input-list__fields">{error || "No tenants available"}</div>
+          </div>
+        )}
       </Popper>
     </div>
   );

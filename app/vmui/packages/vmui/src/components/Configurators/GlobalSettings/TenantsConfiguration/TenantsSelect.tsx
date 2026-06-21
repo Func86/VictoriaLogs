@@ -3,34 +3,35 @@ import useDeviceDetect from "../../../../hooks/useDeviceDetect";
 import classNames from "classnames";
 import TextField from "../../../Main/TextField/TextField";
 import { TenantType } from "./Tenants";
+import { LogsSessionTenant } from "./hooks/useFetchAccountIds";
 import Button from "../../../Main/Button/Button";
 import { LOGS_DOCS_URL } from "../../../../constants/logs";
 
 interface Props extends TenantType {
-  accountIds: string[];
+  tenants: LogsSessionTenant[];
   tenantId: string;
   search: string;
   onSearch: (value: string) => void;
   onChange: (tenant: Partial<TenantType>) => void;
 }
 
-const TenantsSelect: FC<Props> = ({ accountIds, tenantId, search, onSearch, onChange }) => {
+const tenantKey = (tenant: LogsSessionTenant) => `${tenant.accountID}:${tenant.projectID}`;
+
+const TenantsSelect: FC<Props> = ({ tenants, tenantId, search, onSearch, onChange }) => {
   const { isMobile } = useDeviceDetect();
 
-  const accountIdsFiltered = useMemo(() => {
-    if (!search) return accountIds;
+  const tenantsFiltered = useMemo(() => {
+    if (!search) return tenants;
     try {
       const regexp = new RegExp(search, "i");
-      const found = accountIds.filter((item) => regexp.test(item));
-      return found.sort((a,b) => (a.match(regexp)?.index || 0) - (b.match(regexp)?.index || 0));
+      return tenants.filter((tenant) => regexp.test(tenant.label) || regexp.test(tenantKey(tenant)));
     } catch (e) {
       return [];
     }
-  }, [search, accountIds]);
+  }, [search, tenants]);
 
-  const createHandlerChange = (value: string) => () => {
-    const [accountId, projectId] = value.split(":");
-    onChange({ accountId, projectId });
+  const createHandlerChange = (tenant: LogsSessionTenant) => () => {
+    onChange({ accountId: tenant.accountID, projectId: tenant.projectID });
   };
 
   return (
@@ -49,17 +50,17 @@ const TenantsSelect: FC<Props> = ({ accountIds, tenantId, search, onSearch, onCh
           type="search"
         />
       </div>
-      {accountIdsFiltered.map(id => (
+      {tenantsFiltered.map(tenant => (
         <div
           className={classNames({
             "vm-list-item": true,
             "vm-list-item_mobile": isMobile,
-            "vm-list-item_active": id === tenantId
+            "vm-list-item_active": tenantKey(tenant) === tenantId
           })}
-          key={id}
-          onClick={createHandlerChange(id)}
+          key={tenantKey(tenant)}
+          onClick={createHandlerChange(tenant)}
         >
-          {id}
+          {tenant.label}
         </div>
       ))}
       <div className="vm-tenant-input-list__buttons">
